@@ -1,0 +1,65 @@
+
+#################### Wczytywanie bibliotek ####################
+conda install -c conda-forge imbalanced-learn
+import imblearn
+import pandas as pd
+import numpy as np 
+import matplotlib.pyplot as plt
+
+
+#################### Odczyt i przetwarzenie danych ####################
+df = pd.read_csv('C:/Users/lenovo/Desktop/Vscode/Ćwiczenia z pythona/pokemon_data.csv')
+df.head()
+cols=['Attack','Defense','Sp. Atk','Sp. Def','Speed','HP']
+df2 = df[cols]
+df2['Miara']= (df2['Attack']+df2['Sp. Atk']+df2['Speed'])
+
+warunki = [
+    (df2['Miara'] < 300),
+    (df2['Miara'] >= 300)
+    ]
+values = [0,1]
+df2['Ranga'] = np.select(warunki, values)
+df2.head()
+
+
+#################### Prezentacja liczebności ####################
+df2['Ranga'].value_counts()
+
+#################### TEST I TRAIN ####################
+from sklearn.model_selection import train_test_split
+cols = ['Attack','Sp. Atk','Speed']
+y = df2['Ranga']
+X = df2[cols]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+
+#################### Prezentacja liczebności podziału ####################
+print("X_train: ", X_train.shape)
+print("y_train: ", y_train.shape)
+print("X_test: ", X_test.shape)
+print("y_test: ", y_test.shape)
+
+#################### Próbkowanie + prezentacja wyników ####################
+print("Before OverSampling, counts of label '1': {}".format(sum(y_train == 1)))
+print("Before OverSampling, counts of label '0': {} \n".format(sum(y_train == 0)))
+  
+# import SMOTE module from imblearn library
+from imblearn.over_sampling import SMOTE
+# lub 'minority'
+sm = SMOTE(random_state = 2,sampling_strategy=0.5)
+X_train_res, y_train_res = sm.fit_sample(X_train, y_train.ravel())
+print('Before OverSampling, the shape of train_X: {}'.format(X_train.shape))
+print('Before OverSampling, the shape of train_y: {} \n'.format(y_train.shape))  
+print('After OverSampling, the shape of train_X: {}'.format(X_train_res.shape))
+print('After OverSampling, the shape of train_y: {} \n'.format(y_train_res.shape))
+  
+print("After OverSampling, counts of label '1': {}".format(sum(y_train_res == 1)))
+print("After OverSampling, counts of label '0': {}".format(sum(y_train_res == 0)))
+
+
+
+
+
+
+
